@@ -16,6 +16,16 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def add_text_to_image(image_path, top_text, bottom_text):
 
     img = Image.open(image_path)
+    
+    if img.mode in ('RGBA', 'P', 'LA'):
+        rgb_img = Image.new('RGB', img.size, (255, 255, 255))
+        if img.mode == 'P':
+            img = img.convert('RGBA')
+        rgb_img.paste(img, mask=img.split()[-1] if img.mode in ('RGBA', 'LA') else None)
+        img = rgb_img
+    elif img.mode != 'RGB':
+        img = img.convert('RGB')
+    
     draw = ImageDraw.Draw(img)
     
     try:
